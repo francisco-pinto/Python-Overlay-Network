@@ -25,7 +25,6 @@ class Router:
 
     def listenRtp(self):				
         """Listen for RTP packets."""
-        print(self.rtpSocket.gettimeout())
         while True:
             try:
                 self.data = self.rtpSocket.recv(20480)
@@ -61,37 +60,15 @@ class Router:
             tkMessageBox.showwarning('Unable to Bind', 'Unable to bind PORT')
 
 
-
-    def makeRtp(self, payload, frameNbr):
-        """RTP-packetize the video data."""
-        version = 2
-        padding = 0
-        extension = 0
-        cc = 0
-        marker = 0
-        pt = 26 # MJPEG type
-        seqnum = frameNbr
-        ssrc = 0
-
-        rtpPacket = RtpPacket()
-
-        rtpPacket.encode(version, padding, extension, cc, seqnum, marker, pt, ssrc, payload)
-        print("Encoding RTP Packet: " + str(seqnum))
-
-        return rtpPacket.getPacket()
-
-
-
     def sendRtp(self):
         """Send RTP packets over UDP."""
         print(self.data)
         while True:
             if self.data:
                 print("Sending")
-                packet =  self.makeRtp(self.data, self.frameNbr)
 
-                #self.rtspSocket.sendto(packet, ('10.0.1.20', 25000))
-                self.sendrtpSocket.sendto(packet, ('10.0.2.20', 25000))
+                self.sendrtpSocket.sendto(self.data, ('10.0.1.20', 25000))
+                self.sendrtpSocket.sendto(self.data, ('10.0.2.20', 25000))
 
 
 
