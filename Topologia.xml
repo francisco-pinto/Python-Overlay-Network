@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <topology>
   <nodes>
-      <node id="no1">
+      <node id="n1">
           <interfaces>
               <interface>
                   <ip>10.0.0.10</ip>
@@ -9,7 +9,7 @@
               </interface>
           </interfaces>
       </node>
-      <node id="no2">
+      <node id="n2">
           <interfaces>
               <interface>
                   <ip>10.0.0.1</ip>
@@ -25,7 +25,7 @@
               </interface>
           </interfaces>
       </node>
-      <node id="no3">
+      <node id="n3">
           <interfaces>
               <interface>
                   <ip>10.0.4.1</ip>
@@ -41,7 +41,7 @@
               </interface>
           </interfaces>
       </node>
-      <node id="no4">
+      <node id="n4">
           <interfaces>
               <interface>
                   <ip>10.0.1.2</ip>
@@ -57,7 +57,7 @@
               </interface>
           </interfaces>
       </node>
-      <node id="hn6">
+      <node id="n6">
           <interfaces>
               <interface>
                   <ip>10.0.5.20</ip>
@@ -65,7 +65,7 @@
               </interface>
           </interfaces>
       </node>
-      <node id="hn5">
+      <node id="n5">
           <interfaces>
               <interface>
                   <ip>10.0.2.20</ip>

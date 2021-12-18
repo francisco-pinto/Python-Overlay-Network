@@ -8,25 +8,41 @@ from xml.dom import minidom
 from VideoStream import VideoStream
 from RtpPacket import RtpPacket
 
-class Node:
+class Interface:
 	ip=0
 	port=0
-	online=0
 
 	def __init__(self, ip, port):
 		self.ip=ip
-		self.port=port		
+		self.port=port
+
+class Node:
+	id=0
+	interfaces=[]
+	aliveCount=0
+	online=0
+
+	def __init__(self, id, online):
+		self.id=id	
+		self.online=online
+		self.aliveCount=3
+
+	def addInterface(self, ip, port):
+		self.interfaces.append(Interface(ip, port))	
+
 class Servidor:	
 
 	clientInfo = {}
 	nodes = []
-	maintenanceRTPSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	maintenanceSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 	def __init__(self):
-		#self.rtpSocket.settimeout(15)
 		self.GetNetworkTopology()
+		self.openRouterPort()
 		maintenance=threading.Thread(target=self.TopologyMaintenance, args=())
 		maintenance.start()
+
+		print("inicio")
 		
 	def GetNetworkTopology(self):
 		file = minidom.parse('Topologia.xml')
@@ -34,38 +50,79 @@ class Servidor:
 		nodes = file.getElementsByTagName('node')
 
 		for node in nodes:
-			interfaces = node.getElementsByTagName('interface')
+			Id = node.attributes['id'].value
 			
+			#Create node
+			no = Node(Id, 0)
+
+			interfaces = node.getElementsByTagName('interface')
+	
 			for interface in interfaces:
 				ips=interface.getElementsByTagName('ip')
 				ports=interface.getElementsByTagName('port')
 				
 				for ip in ips:
-					print("ip:")
-					print(ip.firstChild.data)
+					Ip=ip.firstChild.data
 				
 				for port in ports:
-					print("port:")
-					print(port.firstChild.data)
-				
-				nodes.append(Node(ip, port))
+					Port=port.firstChild.data
 
-		#Estamos com erro num getlement by name
-		#Precisamos de colocar uma estratégia dos nśo
-		
-		# one specific item attribute
-		#for node in nodes:
-			#print("IP:")
-			#print(node.ip)
-			#print("PORT:")
-			#print(node.port)
-			#print(node.online)
+				#Add all interfaces to node
+				no.addInterface(ip, port)
+			
+			#Add node to list of nodes
+			self.nodes.append(no)
+
+				
+
 
 	def TopologyMaintenance(self):
 		while True:
-			nodeData = self.maintenanceRTPSocket.recv(20480)
-			print(nodeData)
+			
+			for node in self.nodes:
+				print(node.online)
+
+			try:
+				print("A ouvir")
+				nodeData = self.maintenanceSocket.recv(20480)
+				#print(nodeData)
+
+				nodeDataId = nodeData.decode().replace("Alive ", "")
+				#print(nodeDataId)
+				for node in self.nodes:
+					#Verify if online nodes are disconnected
+					#Basically if in 3 secs they dont send message, they are disconnected 
+					if node.id!=nodeDataId and node.online==1:
+						if node.aliveCount==0:
+							node.aliveCount=3
+							node.online=0
+						else:
+							node.aliveCount=node.aliveCount-1
+
+					if node.id==nodeDataId and node.online==0:
+						node.online=1
+
+				
+			except:
+				print("Tentou")
+			
 			sleep(1)
+
+	def openRouterPort(self):
+		"""Open RTP socket binded to a specified port."""
+		# Create a new datagram socket to receive RTP packets from the server
+		self.maintenanceSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+		# Set the timeout value of the socket to 0.5sec
+		self.maintenanceSocket.settimeout(15)
+
+		try:
+			# Bind the socket to the address using the RTP port
+			self.maintenanceSocket.bind(('0.0.0.0', 25000))
+			print('\nBind \n')
+		except:
+			tkMessageBox.showwarning('Unable to Bind', 'Unable to bind PORT')
+
 
 	def sendRtp(self):
 		"""Send RTP packets over UDP."""
@@ -110,7 +167,6 @@ class Servidor:
 		print("Encoding RTP Packet: " + str(seqnum))
 		
 		return rtpPacket.getPacket()
-
 	
 	def main(self):
 		try:
@@ -133,6 +189,7 @@ class Servidor:
 		self.clientInfo['event'] = threading.Event()
 		self.clientInfo['worker']= threading.Thread(target=self.sendRtp)
 		self.clientInfo['worker'].start()
+
 
 if __name__ == "__main__":
 
