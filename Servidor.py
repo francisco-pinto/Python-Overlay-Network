@@ -2,13 +2,70 @@ import sys, socket
 
 from random import randint
 import sys, traceback, threading, socket
+from time import sleep
+from xml.dom import minidom
 
 from VideoStream import VideoStream
 from RtpPacket import RtpPacket
 
+class Node:
+	ip=0
+	port=0
+	online=0
+
+	def __init__(self, ip, port):
+		self.ip=ip
+		self.port=port		
 class Servidor:	
 
 	clientInfo = {}
+	nodes = []
+	maintenanceRTPSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+	def __init__(self):
+		#self.rtpSocket.settimeout(15)
+		self.GetNetworkTopology()
+		maintenance=threading.Thread(target=self.TopologyMaintenance, args=())
+		maintenance.start()
+		
+	def GetNetworkTopology(self):
+		file = minidom.parse('Topologia.xml')
+
+		nodes = file.getElementsByTagName('node')
+
+		for node in nodes:
+			interfaces = node.getElementsByTagName('interface')
+			
+			for interface in interfaces:
+				ips=interface.getElementsByTagName('ip')
+				ports=interface.getElementsByTagName('port')
+				
+				for ip in ips:
+					print("ip:")
+					print(ip.firstChild.data)
+				
+				for port in ports:
+					print("port:")
+					print(port.firstChild.data)
+				
+				nodes.append(Node(ip, port))
+
+		#Estamos com erro num getlement by name
+		#Precisamos de colocar uma estratégia dos nśo
+		
+		# one specific item attribute
+		#for node in nodes:
+			#print("IP:")
+			#print(node.ip)
+			#print("PORT:")
+			#print(node.port)
+			#print(node.online)
+
+	def TopologyMaintenance(self):
+		while True:
+			nodeData = self.maintenanceRTPSocket.recv(20480)
+			print(nodeData)
+			sleep(1)
 
 	def sendRtp(self):
 		"""Send RTP packets over UDP."""
@@ -78,6 +135,7 @@ class Servidor:
 		self.clientInfo['worker'].start()
 
 if __name__ == "__main__":
+
 	(Servidor()).main()
 
 

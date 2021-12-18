@@ -77,6 +77,7 @@ if __name__ == "__main__":
         except:
             break
     
+    #arg1 é a porta que recebe
 
     Router(sys.argv[1], destPort)
     #openRtpPort()
