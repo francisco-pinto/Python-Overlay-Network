@@ -96,12 +96,10 @@ class Servidor:
 					node_number1=connections.fromNode.replace("n", "")
 					node_number2=connections.toNode.replace("n", "")
 					
-					g.add_edge(int(node_number1), int(node_number2), 1)
-
-					#eSTA A DAR ERRO DE OVERFLOW
+					g.add_edge(int(node_number1) - 1, int(node_number2) - 1, 1)
 
 
-		D = self.dijkstra(g, 1)
+		D = self.dijkstra(g, 0)
 
 		print(D)
 	
