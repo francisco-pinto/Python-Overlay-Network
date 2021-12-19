@@ -8,6 +8,12 @@
                   <port>10000</port>
               </interface>
           </interfaces>
+          <links>
+            <link id="1-2">
+                <from node="n1" ip="10.0.0.10"/>
+                <to node="n2" ip="10.0.0.1"/>
+            </link>
+          </links>
       </node>
       <node id="n2">
           <interfaces>
@@ -20,124 +26,150 @@
                   <port>10000</port>
               </interface>
               <interface>
-                  <ip>10.0.4.2</ip>
+                  <ip>10.0.3.1</ip>
                   <port>10000</port>
               </interface>
           </interfaces>
+          <links>
+            <link id="2-3">
+              <from node="n2" ip="10.0.1.1"/>
+              <to node="n3" ip="10.0.1.2"/>
+            </link>
+            <link id="2-1">
+              <from node="n2" ip="10.0.0.1"/>
+              <to node="n1" ip="10.0.0.10"/>
+            </link>
+            <link id="2-5">
+              <from node="n2" ip="10.0.3.1"/>
+              <to node="n5" ip="10.0.3.2"/>
+            </link>
+          </links>
       </node>
       <node id="n3">
           <interfaces>
               <interface>
-                  <ip>10.0.4.1</ip>
+                  <ip>10.0.2.1</ip>
                   <port>10000</port>
               </interface>
               <interface>
-                  <ip>10.0.3.2</ip>
+                  <ip>10.0.1.2</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.4.1</ip>
+                  <port>10000</port>
+              </interface>
+          </interfaces>
+          <links>
+            <link id="3-2">
+              <from node="n3" ip="10.0.1.2"/>
+              <to node="n2" ip="10.0.1.1"/>
+            </link>
+            <link id="3-5">
+              <from node="n3" ip="10.0.4.1"/>
+              <to node="n5" ip="10.0.4.2"/>
+            </link>
+            <link id="3-4">
+              <from node="n3" ip="10.0.2.1"/>
+              <to node="n4" ip="10.0.2.2"/>
+            </link>
+          </links>
+      </node>
+      <node id="n4">
+          <interfaces>
+              <interface>
+                  <ip>10.0.2.2</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.6.1</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.7.1</ip>
+                  <port>10000</port>
+              </interface>
+          </interfaces>
+          <links>
+            <link id="4-7">
+              <from node="n4" ip="10.0.7.1"/>
+              <to node="n7" ip="10.0.7.20"/>
+            </link>
+            <link id="4-6">
+              <from node="n4" ip="10.0.6.1"/>
+              <to node="n6" ip="10.0.6.20"/>
+            </link>
+            <link id="4-3">
+              <from node="n4" ip="10.0.2.2"/>
+              <to node="n3" ip="10.0.2.1"/>
+            </link>
+          </links>
+      </node>
+      <node id="n6">
+          <interfaces>
+              <interface>
+                  <ip>10.0.6.20</ip>
+                  <port>10000</port>
+              </interface>
+          </interfaces>
+          <links>
+            <link id="6-4">
+              <from node="n6" ip="10.0.6.20"/>
+              <to node="n4" ip="10.0.6.1"/>
+            </link>
+          </links>
+      </node>
+      <node id="n5">
+          <interfaces>
+              <interface>
+                  <ip>10.0.4.2</ip>
                   <port>10000</port>
               </interface>
               <interface>
                   <ip>10.0.5.1</ip>
                   <port>10000</port>
               </interface>
-          </interfaces>
-      </node>
-      <node id="n4">
-          <interfaces>
               <interface>
-                  <ip>10.0.1.2</ip>
-                  <port>10000</port>
-              </interface>
-              <interface>
-                  <ip>10.0.2.1</ip>
-                  <port>10000</port>
-              </interface>
-              <interface>
-                  <ip>10.0.3.1</ip>
+                  <ip>10.0.3.2</ip>
                   <port>10000</port>
               </interface>
           </interfaces>
+          <links>
+            <link id="5-7">
+              <from node="n5" ip="10.0.5.1"/>
+              <to node="n7" ip="10.0.5.20"/>
+            </link>
+            <link id="5-4">
+              <from node="n5" ip="10.0.4.2"/>
+              <to node="n4" ip="10.0.4.1"/>
+            </link>
+            <link id="5-2">
+              <from node="n5" ip="10.0.3.2"/>
+              <to node="n2" ip="10.0.3.1"/>
+            </link>
+          </links>
       </node>
-      <node id="n6">
+      <node id="n7">
           <interfaces>
+              <interface>
+                  <ip>10.0.7.20</ip>
+                  <port>10000</port>
+              </interface>
               <interface>
                   <ip>10.0.5.20</ip>
                   <port>10000</port>
               </interface>
           </interfaces>
-      </node>
-      <node id="n5">
-          <interfaces>
-              <interface>
-                  <ip>10.0.2.20</ip>
-                  <port>10000</port>
-              </interface>
-          </interfaces>
+          <links>
+            <link id="7-4">
+              <from node="n7" ip="10.0.7.20"/>
+              <to node="n4" ip="10.0.7.1"/>
+            </link>    
+            <link id="7-5">
+              <from node="n7" ip="10.0.5.20"/>
+              <to node="n5" ip="10.0.5.1"/>
+            </link> 
+          </links>
       </node>
   </nodes>
-  <links>
-        <link id="1-2">
-            <from node="n1"/>
-            <to node="n2"/>
-        </link>
-        <link id="2-3">
-            <from node="n2"/>
-            <to node="n3"/>
-        </link>
-        <link id="2-1">
-          <from node="n2"/>
-          <to node="n1"/>
-        </link>
-        <link id="2-5">
-          <from node="n2"/>
-          <to node="n5"/>
-        </link>
-        <link id="3-2">
-          <from node="n3"/>
-          <to node="n2"/>
-        </link>
-        <link id="3-5">
-          <from node="n3"/>
-          <to node="n5"/>
-        </link>
-        <link id="3-4">
-          <from node="n3"/>
-          <to node="n4"/>
-        </link>
-        <link id="4-7">
-          <from node="n4"/>
-          <to node="n7"/>
-        </link>
-        <link id="4-6">
-          <from node="n4"/>
-          <to node="n6"/>
-        </link>
-        <link id="4-3">
-          <from node="n4"/>
-          <to node="n3"/>
-        </link>
-        <link id="5-7">
-          <from node="n5"/>
-          <to node="n7"/>
-        </link>
-        <link id="5-4">
-          <from node="n5"/>
-          <to node="n4"/>
-        </link>
-        <link id="5-2">
-          <from node="n5"/>
-          <to node="n2"/>
-        </link>
-        <link id="6-4">
-          <from node="n6"/>
-          <to node="n4"/>
-        </link> 
-        <link id="7-4">
-          <from node="n7"/>
-          <to node="n4"/>
-        </link>    
-        <link id="7-5">
-          <from node="n7"/>
-          <to node="n5"/>
-        </link>     
-  </links>
 </topology>

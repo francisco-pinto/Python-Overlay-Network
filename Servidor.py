@@ -8,6 +8,20 @@ from xml.dom import minidom
 from VideoStream import VideoStream
 from RtpPacket import RtpPacket
 
+from queue import PriorityQueue
+
+class Graph:
+	def __init__(self, num_of_nodes):
+		self.v = num_of_nodes
+		self.edges = [[-1 for i in range(num_of_nodes)] for j in range(num_of_nodes)]
+		self.visited = []
+	
+	#1 if connection exist
+	#-1 if connection don't exist
+	def	add_edge(self, u, v, weight):
+		self.edges[u][v] = weight
+		self.edges[v][u] = weight
+		
 class Interface:
 	ip=0
 	port=0
@@ -16,6 +30,17 @@ class Interface:
 		self.ip=ip
 		self.port=port
 
+class Connection:
+	fromNode=0
+	fromIP=0
+	toNode=0
+	toIP=0
+
+	def __init__(self, fromNode, fromIP, toNode, toIP):
+		self.fromNode=fromNode
+		self.fromIP=fromIP
+		self.toNode=toNode
+		self.toIP=toIP
 class Node:
 	id=0
 	interfaces=[]
@@ -25,11 +50,13 @@ class Node:
 
 	def __init__(self, id, online):
 		self.id=id	
-		self.online=online
+		self.online=1
 		self.aliveCount=3
+		self.connections=[]
+		self.interfaces=[]
 
-	def addConnection(self, connection):
-		self.connections.append(connection)
+	def addConnection(self, fromNode, fromIP, toNode, toIP):
+		self.connections.append(Connection(fromNode, fromIP, toNode, toIP))
 	
 	def addInterface(self, ip, port):
 		self.interfaces.append(Interface(ip, port))
@@ -46,13 +73,43 @@ class Servidor:
 		self.openRouterPort()
 		maintenance=threading.Thread(target=self.TopologyMaintenance, args=())
 		maintenance.start()
-
+		self.CalculateShortestPath()
 		print("inicio")
 		
+	def CalculateShortestPath(self):
+		graphLen=0
+		print("Caminho mais curto")
+		for node in self.nodes:
+			if node.online==1:
+				graphLen=graphLen+1
+
+		print("Tamanho do grafo:")
+		print(graphLen)
+		g=Graph(graphLen)
+
+		
+		print("Várias ligações:")
+		for node in self.nodes:
+			if node.online==1:
+				for connections in node.connections:
+					print(connections.fromNode)
+					node_number1=connections.fromNode.replace("n", "")
+					node_number2=connections.toNode.replace("n", "")
+					
+					g.add_edge(int(node_number1), int(node_number2), 1)
+
+					#eSTA A DAR ERRO DE OVERFLOW
+
+
+		D = self.dijkstra(g, 1)
+
+		print(D)
+	
 	def GetNetworkTopology(self):
 		file = minidom.parse('Topologia.xml')
 
-#GET NODES SPECS
+	#_______________________________________________________
+	#GET NODES SPECS
 		nodes = file.getElementsByTagName('node')
 
 		for node in nodes:
@@ -60,6 +117,9 @@ class Servidor:
 			
 			#Create node
 			no = Node(Id, 0)
+
+	#_______________________________________________________	
+	#GET INTERFACES
 
 			interfaces = node.getElementsByTagName('interface')
 	
@@ -75,55 +135,68 @@ class Servidor:
 
 				#Add all interfaces to node
 				no.addInterface(Ip, Port)
-			
-			#Add node to list of nodes
-			self.nodes.append(no)
 
-#GET NODE LINKS
-		fromIP=[]
-		toIP=[]
+	#_______________________________________________________		
+	#GET LINKS
+			fromNode=0
+			fromIP=0
+			toNode=0
+			toIP=0
+			links = file.getElementsByTagName('link')
 
-		links = file.getElementsByTagName('link')
+			for link in links:
+				froms = link.getElementsByTagName('from')
+		
+				for fromvar in froms:
+					fromNode =fromvar.attributes['node'].value
+					fromIP = fromvar.attributes['ip'].value
+					print(fromIP)
+				tos = link.getElementsByTagName('to')
 
-		for link in links:
-			froms = link.getElementsByTagName('from')
-	
-			for fromvar in froms:
-				fromIP.append(fromvar.attributes['node'].value)
-
-			tos = link.getElementsByTagName('to')
-
-			for to in tos:
-				toIP.append(to.attributes['node'].value)
-
-#PUT CONNECTIONS ON NODES
-
-		for node in self.nodes:
-			#for fromVar in fromIP:
-			print("_____________-")
-			for fromVar, to in zip(fromIP, toIP):
-				if node.id==fromVar:
-					#print("NO e TO=")
-					#print(node.id)
-					#print(to)
-					print("Entrei para o nó")
-					print(node.id)
-					print("Adicionei")
-					print(to)
-					node.addConnection(to)
-
-		for node in self.nodes:
-			#print("node id:")
-			print(node.id)
-			print(node.connections)
+				for to in tos:
+					toNode = to.attributes['node'].value
+					toIP = to.attributes['ip'].value
 				
+				no.addConnection(fromNode, fromIP, toNode, toIP)
+			
 
+			#Add node to list of nodes
+			self.nodes.append(no)	
+
+		for node in self.nodes:
+			print(node.id)
+			for connection in node.connections:
+				print(connection.fromIP)
+		
+
+	def dijkstra(self, graph, start_vertex):
+		D = {v:float('inf') for v in range(graph.v)}
+		D[start_vertex] = 0
+
+		pq = PriorityQueue()
+		pq.put((0, start_vertex))
+
+		while not pq.empty():
+			(dist, current_vertex) = pq.get()
+			graph.visited.append(current_vertex)
+
+			for neighbor in range(graph.v):
+				if graph.edges[current_vertex][neighbor] != -1:
+					distance = graph.edges[current_vertex][neighbor]
+					if neighbor not in graph.visited:
+						old_cost = D[neighbor]
+						new_cost = D[current_vertex] + distance
+						if new_cost < old_cost:
+							pq.put((new_cost, neighbor))
+							D[neighbor] = new_cost
+		return D
 
 	def TopologyMaintenance(self):
+		"""Check what nodes still online"""
 		while True:
 			
-			for node in self.nodes:
-				print(node.online)
+			#for node in self.nodes:
+				#print(node.online)
 
 			try:
 				print("A ouvir")
