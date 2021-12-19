@@ -19,6 +19,7 @@ class Interface:
 class Node:
 	id=0
 	interfaces=[]
+	connections=[]
 	aliveCount=0
 	online=0
 
@@ -27,8 +28,12 @@ class Node:
 		self.online=online
 		self.aliveCount=3
 
+	def addConnection(self, connection):
+		self.connections.append(connection)
+	
 	def addInterface(self, ip, port):
-		self.interfaces.append(Interface(ip, port))	
+		self.interfaces.append(Interface(ip, port))
+
 
 class Servidor:	
 
@@ -47,6 +52,7 @@ class Servidor:
 	def GetNetworkTopology(self):
 		file = minidom.parse('Topologia.xml')
 
+#GET NODES SPECS
 		nodes = file.getElementsByTagName('node')
 
 		for node in nodes:
@@ -68,11 +74,48 @@ class Servidor:
 					Port=port.firstChild.data
 
 				#Add all interfaces to node
-				no.addInterface(ip, port)
+				no.addInterface(Ip, Port)
 			
 			#Add node to list of nodes
 			self.nodes.append(no)
 
+#GET NODE LINKS
+		fromIP=[]
+		toIP=[]
+
+		links = file.getElementsByTagName('link')
+
+		for link in links:
+			froms = link.getElementsByTagName('from')
+	
+			for fromvar in froms:
+				fromIP.append(fromvar.attributes['node'].value)
+
+			tos = link.getElementsByTagName('to')
+
+			for to in tos:
+				toIP.append(to.attributes['node'].value)
+
+#PUT CONNECTIONS ON NODES
+
+		for node in self.nodes:
+			#for fromVar in fromIP:
+			print("_____________-")
+			for fromVar, to in zip(fromIP, toIP):
+				if node.id==fromVar:
+					#print("NO e TO=")
+					#print(node.id)
+					#print(to)
+					print("Entrei para o nó")
+					print(node.id)
+					print("Adicionei")
+					print(to)
+					node.addConnection(to)
+
+		for node in self.nodes:
+			#print("node id:")
+			print(node.id)
+			print(node.connections)
 				
 
 
@@ -122,7 +165,6 @@ class Servidor:
 			print('\nBind \n')
 		except:
 			tkMessageBox.showwarning('Unable to Bind', 'Unable to bind PORT')
-
 
 	def sendRtp(self):
 		"""Send RTP packets over UDP."""
