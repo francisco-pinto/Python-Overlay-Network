@@ -2,6 +2,7 @@ import sys, socket
 
 from random import randint
 import sys, traceback, threading, socket
+from tkinter.constants import E
 from time import sleep
 from xml.dom import minidom
 
@@ -14,14 +15,19 @@ class Graph:
 	def __init__(self, num_of_nodes):
 		self.v = num_of_nodes
 		self.edges = [[-1 for i in range(num_of_nodes)] for j in range(num_of_nodes)]
+		print(self.edges)
 		self.visited = []
 	
 	#1 if connection exist
 	#-1 if connection don't exist
 	def	add_edge(self, u, v, weight):
-		self.edges[u][v] = weight
-		self.edges[v][u] = weight
-		
+		#print("A adicionar edge")
+		try:
+			self.edges[u][v] = weight
+			self.edges[v][u] = weight	
+		except:
+			"""Link disconnected"""
+			#print("Link disconnected")
 class Interface:
 	ip=0
 	port=0
@@ -29,7 +35,6 @@ class Interface:
 	def __init__(self, ip, port):
 		self.ip=ip
 		self.port=port
-
 class Connection:
 	fromNode=0
 	fromIP=0
@@ -60,8 +65,6 @@ class Node:
 	
 	def addInterface(self, ip, port):
 		self.interfaces.append(Interface(ip, port))
-
-
 class Servidor:	
 
 	clientInfo = {}
@@ -70,10 +73,10 @@ class Servidor:
 
 	def __init__(self):
 		self.GetNetworkTopology()
+		self.CalculateShortestPath()
 		self.openRouterPort()
 		maintenance=threading.Thread(target=self.TopologyMaintenance, args=())
 		maintenance.start()
-		self.CalculateShortestPath()
 		print("inicio")
 		
 	def CalculateShortestPath(self):
@@ -83,24 +86,22 @@ class Servidor:
 			if node.online==1:
 				graphLen=graphLen+1
 
-		print("Tamanho do grafo:")
-		print(graphLen)
 		g=Graph(graphLen)
-
 		
 		print("Várias ligações:")
 		for node in self.nodes:
 			if node.online==1:
 				for connections in node.connections:
-					print(connections.fromNode)
+					#print("Adding connections")
+					#print(connections.fromNode)
+					#print(connections.toNode)
 					node_number1=connections.fromNode.replace("n", "")
 					node_number2=connections.toNode.replace("n", "")
 					
 					g.add_edge(int(node_number1) - 1, int(node_number2) - 1, 1)
 
-
 		D = self.dijkstra(g, 0)
-
+		print("Disjkstra: ")
 		print(D)
 	
 	def GetNetworkTopology(self):
@@ -148,7 +149,7 @@ class Servidor:
 				for fromvar in froms:
 					fromNode =fromvar.attributes['node'].value
 					fromIP = fromvar.attributes['ip'].value
-					print(fromIP)
+					#print(fromIP)
 				tos = link.getElementsByTagName('to')
 
 				for to in tos:
@@ -161,13 +162,14 @@ class Servidor:
 			#Add node to list of nodes
 			self.nodes.append(no)	
 
-		for node in self.nodes:
-			print(node.id)
-			for connection in node.connections:
-				print(connection.fromIP)
+		#for node in self.nodes:
+		#	print(node.id)
+		#	for connection in node.connections:
+		#		print(connection.fromIP)
 		
 
 	def dijkstra(self, graph, start_vertex):
+		#print("ENtrou no disjkstra")
 		D = {v:float('inf') for v in range(graph.v)}
 		D[start_vertex] = 0
 
@@ -184,6 +186,12 @@ class Servidor:
 					if neighbor not in graph.visited:
 						old_cost = D[neighbor]
 						new_cost = D[current_vertex] + distance
+
+						#Old_NOde e New Node e adicionar desta maneira
+						#DE forma a termos a rota para cada um dos nós
+
+						#old_cost = str(neighbor)
+						#new_cost = str(current_vertex) + str(distance)
 						if new_cost < old_cost:
 							pq.put((new_cost, neighbor))
 							D[neighbor] = new_cost
@@ -210,11 +218,18 @@ class Servidor:
 						if node.aliveCount==0:
 							node.aliveCount=3
 							node.online=0
+							self.CalculateShortestPath()
 						else:
 							node.aliveCount=node.aliveCount-1
 
 					if node.id==nodeDataId and node.online==0:
 						node.online=1
+						#Every time a new node is connected we need to
+						#Recalculate the shortestPath
+						try:
+							self.CalculateShortestPath()
+						except Exception as e:
+							print(e)
 
 				
 			except:
