@@ -72,22 +72,39 @@ class Servidor:
 		
 		self.CreateRoutingTable(paths)
 
-
 	def CreateRoutingTable(self, paths):
 		
 		for path in paths:
 			
 			dest=path[0]
 			path.pop(0)  #Remove from 0 position 
-		 
+
+			#GEt ip's through the id's
+			for no in path:
+				try:
+					nextNodeIndex=path.index(no)
+					nextNode=path[int(nextNodeIndex)+1]
+					print(nextNodeIndex)
+					for node in self.nodes:
+						for connections in node.connections:
+							if node.id==no and nextNode==connections.toNode:
+								#print("entrei")
+								#print(no)
+								#print(node.id)
+
+								#print("connections")
+								#print(nextNode)
+								#print(connections.toNode)
+								path.replace(no, connections.toIP)
+				except:
+					#Forçar a colocação do último IP
+					break
 
 			s=";"
-			s=s.join(path)
+			s=s.join(reversed(path))
 			self.routingTable[dest]=s
-
 		
 		print(self.routingTable)
-
 
 	def GetNetworkTopology(self):
 		file = minidom.parse('Topologia.xml')
@@ -158,7 +175,7 @@ class Servidor:
 			
 			#for node in self.nodes:
 				#print(node.online)
-
+ 
 			try:
 				print("A ouvir")
 				nodeData = self.maintenanceSocket.recv(20480)
