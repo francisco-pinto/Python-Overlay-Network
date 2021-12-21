@@ -28,7 +28,7 @@ class Node:
 
     def __init__(self, id, online):
         self.id=id	
-        self.online=online
+        self.online=1
         self.aliveCount=3
         self.connections=[]
         self.interfaces=[]

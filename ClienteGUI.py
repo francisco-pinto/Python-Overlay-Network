@@ -2,7 +2,7 @@ from tkinter import *
 import tkinter.messagebox
 from PIL import Image, ImageTk
 import socket, threading, sys, traceback, os
-
+from time import sleep
 from RtpPacket import RtpPacket
 
 CACHE_FILE_NAME = "cache-"
@@ -10,6 +10,8 @@ CACHE_FILE_EXT = ".jpg"
 
 class ClienteGUI:
 	
+	aliveSignalSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
 	# Initiation..
 	def __init__(self, master, addr, port):
 		self.master = master
@@ -22,9 +24,21 @@ class ClienteGUI:
 		self.requestSent = -1
 		self.teardownAcked = 0
 		self.openRtpPort()
+		t=threading.Thread(target=self.sendAliveSignal, args=())
+		t.start()
 		self.playMovie()
 		self.frameNbr = 0
-		
+	
+	def sendAliveSignal(self):
+		"""Send alive signal."""
+		while True:
+			print("Enviei")
+			host_name = socket.gethostname()
+			host_name = "c"+ host_name
+			print("Hostname :  ",host_name)
+			self.aliveSignalSocket.sendto(str("Alive " + host_name).encode(), ('10.0.0.10', 25000))
+			sleep(1)
+
 	def createWidgets(self):
 		"""Build GUI."""
 		# Create Setup button

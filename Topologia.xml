@@ -93,7 +93,7 @@
           <links>
             <link id="4-7">
               <from node="n4" ip="10.0.5.1"/>
-              <to node="n7" ip="10.0.5.20"/>
+              <to node="cn7" ip="10.0.5.20"/>
             </link>
             <link id="4-3">
               <from node="n4" ip="10.0.7.2"/>
@@ -105,7 +105,7 @@
             </link>
           </links>
       </node>
-      <node id="n6">
+      <node id="cn6">
           <interfaces>
               <interface>
                   <ip>10.0.4.20</ip>
@@ -114,7 +114,7 @@
           </interfaces>
           <links>
             <link id="6-5">
-              <from node="n6" ip="10.0.4.20"/>
+              <from node="cn6" ip="10.0.4.20"/>
               <to node="n5" ip="10.0.4.1"/>
             </link>
           </links>
@@ -137,7 +137,7 @@
           <links>
             <link id="5-7">
               <from node="n5" ip="10.0.6.1"/>
-              <to node="n7" ip="10.0.6.20"/>
+              <to node="cn7" ip="10.0.6.20"/>
             </link>
             <link id="5-3">
               <from node="n5" ip="10.0.3.2"/>
@@ -145,11 +145,11 @@
             </link>
             <link id="5-6">
               <from node="n5" ip="10.0.4.1"/>
-              <to node="n6" ip="10.0.4.20"/>
+              <to node="cn6" ip="10.0.4.20"/>
             </link>
           </links>
       </node>
-      <node id="n7">
+      <node id="cn7">
           <interfaces>
               <interface>
                   <ip>10.0.6.20</ip>
@@ -162,11 +162,11 @@
           </interfaces>
           <links>
             <link id="7-4">
-              <from node="n7" ip="10.0.5.20"/>
+              <from node="cn7" ip="10.0.5.20"/>
               <to node="n4" ip="10.0.5.1"/>
             </link>    
             <link id="7-5">
-              <from node="n7" ip="10.0.6.20"/>
+              <from node="cn7" ip="10.0.6.20"/>
               <to node="n5" ip="10.0.6.1"/>
             </link> 
           </links>

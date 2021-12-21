@@ -88,12 +88,12 @@ class Graph(object):
             while node != start_node:
                 path.append(node)
                 node = previous_nodes[node]
-                print("Fds tentei")
-                
+
             # Add the start node manually
             path.append(start_node)
             
-            print("We found the following best path with a value of {}.".format(shortest_path[target_node]))
-            print(" -> ".join(reversed(path)))
+            #print("We found the following best path with a value of {}.".format(shortest_path[target_node]))
+            #print(" -> ".join(reversed(path)))
+            return (path)
         except:
             print("Impossible to detect path")

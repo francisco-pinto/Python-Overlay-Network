@@ -20,6 +20,7 @@ from collections import defaultdict
 
 class Servidor:	
 
+	routingTable = {}
 	clientInfo = {}
 	nodes = []
 	maintenanceSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -53,8 +54,6 @@ class Servidor:
 					#Verify if neighbor is online
 					for neighborNode in self.nodes:
 						if(neighborNode.id==node_number2 and neighborNode.online==1):
-							print("O nó está online é: ")
-							print(node_number2)
 							init_graph[node_number1][node_number2] = 1
 			
 		#print(init_graph)
@@ -63,7 +62,32 @@ class Servidor:
 
 		previous_nodes, shortest_path = graph.dijkstra_algorithm("n1")
 
-		graph.print_result(previous_nodes, shortest_path, "n1", "n5")
+		#path para todos os clientes ativos
+		paths=[]
+		for node in self.nodes:
+			if "cn" in node.id and node.online==1:
+				paths.append(graph.print_result(previous_nodes, shortest_path, "n1", str(node.id)))
+			else:
+				print("There are no clients online")
+		
+		self.CreateRoutingTable(paths)
+
+
+	def CreateRoutingTable(self, paths):
+		
+		for path in paths:
+			
+			dest=path[0]
+			path.pop(0)  #Remove from 0 position 
+		 
+
+			s=";"
+			s=s.join(path)
+			self.routingTable[dest]=s
+
+		
+		print(self.routingTable)
+
 
 	def GetNetworkTopology(self):
 		file = minidom.parse('Topologia.xml')
