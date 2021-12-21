@@ -10,49 +10,13 @@ from VideoStream import VideoStream
 from RtpPacket import RtpPacket
 
 from Graph import Graph
+from Overlay import Node
+from Overlay import Connection
+from Overlay import Interface
+
 from collections import defaultdict
 
 
-	
-class Interface:
-	ip=0
-	port=0
-
-	def __init__(self, ip, port):
-		self.ip=ip
-		self.port=port
-
-class Connection:
-	fromNode=0
-	fromIP=0
-	toNode=0
-	toIP=0
-
-	def __init__(self, fromNode, fromIP, toNode, toIP):
-		self.fromNode=fromNode
-		self.fromIP=fromIP
-		self.toNode=toNode
-		self.toIP=toIP
-
-class Node:
-	id=0
-	interfaces=[]
-	connections=[]
-	aliveCount=0
-	online=0
-
-	def __init__(self, id, online):
-		self.id=id	
-		self.online=1
-		self.aliveCount=3
-		self.connections=[]
-		self.interfaces=[]
-
-	def addConnection(self, fromNode, fromIP, toNode, toIP):
-		self.connections.append(Connection(fromNode, fromIP, toNode, toIP))
-	
-	def addInterface(self, ip, port):
-		self.interfaces.append(Interface(ip, port))
 
 class Servidor:	
 
@@ -62,12 +26,11 @@ class Servidor:
 
 	def __init__(self):
 		self.GetNetworkTopology()
-		self.CalculateShortestPath()
 		self.openRouterPort()
+		self.CalculateShortestPath()
 		maintenance=threading.Thread(target=self.TopologyMaintenance, args=())
 		maintenance.start()
 		print("inicio")
-
 
 	def CalculateShortestPath(self):
 		
@@ -82,21 +45,20 @@ class Servidor:
 
 		for node in self.nodes:
 			if node.online==1:
-				
 				for connections in node.connections:
-					#print("Adding connections")
-					#print(connections.fromNode)
-					#print(connections.toNode)
+
 					node_number1=connections.fromNode
 					node_number2=connections.toNode
-					#print("Numero 1")
-					#print(node_number1)
 
-					#print("Numero 2")
-					#print(node_number2)
-					init_graph[node_number1][node_number2] = 1
+					#Verify if neighbor is online
+					for neighborNode in self.nodes:
+						if(neighborNode.id==node_number2 and neighborNode.online==1):
+							print("O nó está online é: ")
+							print(node_number2)
+							init_graph[node_number1][node_number2] = 1
 			
-		
+		#print(init_graph)
+
 		graph = Graph(nodeId, init_graph)
 
 		previous_nodes, shortest_path = graph.dijkstra_algorithm("n1")
@@ -166,14 +128,6 @@ class Servidor:
 		#	for connection in node.connections:
 		#		print(connection.fromIP)
 		
-
-	def shortest(self, v, path):
-		"""make shortest path from v.previous"""
-		if v.previous:
-			path.append(v.previous.get_id())
-			self.shortest(v.previous, path)
-		return
-
 	def TopologyMaintenance(self):
 		"""Check what nodes still online"""
 		while True:
@@ -199,6 +153,7 @@ class Servidor:
 						else:
 							node.aliveCount=node.aliveCount-1
 
+					#Nó tornou-se offline
 					if node.id==nodeDataId and node.online==0:
 						node.online=1
 						#Every time a new node is connected we need to
@@ -207,10 +162,14 @@ class Servidor:
 							self.CalculateShortestPath()
 						except Exception as e:
 							print(e)
+					
+					#Restart à tentativa de conexões que cada nó pode falhar
+					if node.id==nodeDataId and node.aliveCount<3:
+						node.aliveCount=3
 
 				
 			except:
-				print("Tentou")
+				print("Error while trying to check what nodes are online")
 			
 			sleep(1)
 

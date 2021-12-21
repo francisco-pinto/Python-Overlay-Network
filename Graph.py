@@ -73,7 +73,7 @@ class Graph(object):
                     # We also update the best path to the current node
                     previous_nodes[neighbor] = current_min_node
             
-            print(current_min_node)
+            #print(current_min_node)
             unvisited_nodes.remove(current_min_node)
         
 
@@ -84,12 +84,16 @@ class Graph(object):
         path = []
         node = target_node
 
-        while node != start_node:
-            path.append(node)
-            node = previous_nodes[node]
-
-        # Add the start node manually
-        path.append(start_node)
-        
-        print("We found the following best path with a value of {}.".format(shortest_path[target_node]))
-        print(" -> ".join(reversed(path)))
+        try:
+            while node != start_node:
+                path.append(node)
+                node = previous_nodes[node]
+                print("Fds tentei")
+                
+            # Add the start node manually
+            path.append(start_node)
+            
+            print("We found the following best path with a value of {}.".format(shortest_path[target_node]))
+            print(" -> ".join(reversed(path)))
+        except:
+            print("Impossible to detect path")
