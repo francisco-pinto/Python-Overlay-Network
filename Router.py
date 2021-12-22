@@ -6,10 +6,13 @@ from time import sleep
 from RtpPacket import RtpPacket
 
 class Router:	
+
+    RoutingTable = {}
     sendrtpSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     rtpSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     aliveSignalSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    getRoutingTableSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     data = 0
 
     def __init__(self, destIP):
@@ -19,9 +22,22 @@ class Router:
         self.frameNbr = 0
         t=threading.Thread(target=self.sendAliveSignal, args=())
         t.start()
+        getRoutingTable = threading.Thread(target=self.getRoutingTable, args=())
+        getRoutingTable.start()
         self.openRtpPort()
         self.listenRtp()
    
+    def getRoutingTable(self):
+        while True:
+            try:
+                teste = self.getRoutingTableSocket.recv(20480)
+                print(teste)
+                
+
+            except:
+                print("saiu do loop")
+                break    
+
     def sendAliveSignal(self):
         """Send alive signal."""
         while True:
@@ -37,6 +53,7 @@ class Router:
         while True:
             try:
                 self.data = self.rtpSocket.recv(20480)
+                #print(self.data)
                 for x in self.destIP:
                     t=threading.Thread(target=self.sendRtp, args=(x,))
                     t.start()
@@ -61,6 +78,14 @@ class Router:
             print('\nBind \n')
         except:
             tkMessageBox.showwarning('Unable to Bind', 'Unable to bind PORT')
+
+
+        try:
+            # Bind the socket to the address using the RTP port
+            self.getRoutingTableSocket.bind(('0.0.0.0', 24998))
+            print('\nBind \n')
+        except:
+            tkMessageBox.showwarning('Unable to Bind', 'Unable to bind PORT for ROuting Table')
 
 
     def sendRtp(self, destIP):

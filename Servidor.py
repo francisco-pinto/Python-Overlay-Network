@@ -6,6 +6,8 @@ from tkinter.constants import E
 from time import sleep
 from xml.dom import minidom
 
+import json
+
 from VideoStream import VideoStream
 from RtpPacket import RtpPacket
 
@@ -24,6 +26,7 @@ class Servidor:
 	clientInfo = {}
 	nodes = []
 	maintenanceSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	sendRoutingTableSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 	def __init__(self):
 		self.GetNetworkTopology()
@@ -31,7 +34,27 @@ class Servidor:
 		self.CalculateShortestPath()
 		maintenance=threading.Thread(target=self.TopologyMaintenance, args=())
 		maintenance.start()
+
+		sendRoutingTable=threading.Thread(target=self.SendRoutingTable, args=())
+		sendRoutingTable.start()
+
 		print("inicio")
+
+	def SendRoutingTable(self):
+		"""Send alive signal."""
+		while True:
+			print("Enviei a routing table")
+			
+			for path in self.routingTable:
+				print(self.routingTable[path])
+				dest=self.routingTable[path][0]
+				self.routingTable[path].pop(0)
+				
+				routingTable = str.encode(json.dumps(self.routingTable[path])) #data serialized
+
+				self.sendRoutingTableSocket.sendto(routingTable, (str(dest), 24998))
+			
+			sleep(2)
 
 	def CalculateShortestPath(self):
 		
@@ -74,37 +97,35 @@ class Servidor:
 
 	def CreateRoutingTable(self, paths):
 		
+
 		for path in paths:
-			
+			#print(path)
+			ipPath=[]
 			dest=path[0]
-			path.pop(0)  #Remove from 0 position 
+		
 
 			#GEt ip's through the id's
 			for no in path:
+								
 				try:
 					nextNodeIndex=path.index(no)
-					nextNode=path[int(nextNodeIndex)+1]
 					print(nextNodeIndex)
+					nextNode=path[int(nextNodeIndex)+1]
 					for node in self.nodes:
 						for connections in node.connections:
-							if node.id==no and nextNode==connections.toNode:
-								#print("entrei")
-								#print(no)
-								#print(node.id)
+							if node.id==no and no==connections.fromNode and nextNode==connections.toNode:
+								
+								newIP=no.replace(no, connections.fromIP)
+								ipPath.append(newIP)
 
-								#print("connections")
-								#print(nextNode)
-								#print(connections.toNode)
-								path.replace(no, connections.toIP)
 				except:
-					#Forçar a colocação do último IP
+					#print("Caiu na exceção")
 					break
-
-			s=";"
-			s=s.join(reversed(path))
-			self.routingTable[dest]=s
+			
+			ipPath.reverse()	
+			self.routingTable[dest]=ipPath
 		
-		print(self.routingTable)
+		#print(self.routingTable)
 
 	def GetNetworkTopology(self):
 		file = minidom.parse('Topologia.xml')

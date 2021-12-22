@@ -48,6 +48,10 @@ node n3 {
     network-config {
 	hostname n3
 	!
+	interface eth2
+	 ip address 10.0.7.1/24
+	 ipv6 address 2001:7::1/64
+	!
 	interface eth1
 	 ip address 10.0.3.1/24
 	 ipv6 address 2001:3::1/64
@@ -62,6 +66,7 @@ node n3 {
     labelcoords {557.0 176.0}
     interface-peer {eth0 n2}
     interface-peer {eth1 n5}
+    interface-peer {eth2 n4}
 }
 
 node n4 {
@@ -69,6 +74,10 @@ node n4 {
     model router
     network-config {
 	hostname n4
+	!
+	interface eth2
+	 ip address 10.0.7.2/24
+	 ipv6 address 2001:7::2/64
 	!
 	interface eth1
 	 ip address 10.0.5.1/24
@@ -84,6 +93,7 @@ node n4 {
     labelcoords {496.0 397.0}
     interface-peer {eth0 n2}
     interface-peer {eth1 n7}
+    interface-peer {eth2 n3}
 }
 
 node n5 {
@@ -184,6 +194,11 @@ link l6 {
 
 link l7 {
     nodes {n5 n7}
+    bandwidth 0
+}
+
+link l8 {
+    nodes {n3 n4}
     bandwidth 0
 }
 
