@@ -7,6 +7,7 @@ from time import sleep
 from xml.dom import minidom
 
 import json
+import copy
 
 from VideoStream import VideoStream
 from RtpPacket import RtpPacket
@@ -45,12 +46,24 @@ class Servidor:
 		while True:
 			print("Enviei a routing table")
 			
+			
+
 			for path in self.routingTable:
-				print(self.routingTable[path])
-				dest=self.routingTable[path][0]
-				self.routingTable[path].pop(0)
+				pathToSend=copy.deepcopy(self.routingTable)
+				print(self.routingTable)
 				
-				routingTable = str.encode(json.dumps(self.routingTable[path])) #data serialized
+				#print(pathToSend)
+				dest=pathToSend[path][0]
+				pathToSend[path].pop(0)
+
+				for otherPaths in list(pathToSend):
+					#print(otherPaths)
+					if path!=otherPaths:
+						#print("ENtrei uma vez")
+						pathToSend.pop(otherPaths)
+				#print(pathToSend)
+				
+				routingTable = str.encode(json.dumps(pathToSend)) #data serialized
 
 				self.sendRoutingTableSocket.sendto(routingTable, (str(dest), 24998))
 			

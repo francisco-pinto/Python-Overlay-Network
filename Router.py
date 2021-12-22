@@ -4,15 +4,19 @@ import socket, threading, sys, traceback, os
 import sys
 from time import sleep
 from RtpPacket import RtpPacket
+import json 
+import copy
 
 class Router:	
 
-    RoutingTable = {}
+    routingTable = {}
     sendrtpSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     rtpSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     aliveSignalSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     getRoutingTableSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sendRoutingTableSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
     data = 0
 
     def __init__(self, destIP):
@@ -27,13 +31,53 @@ class Router:
         self.openRtpPort()
         self.listenRtp()
    
+
+    def SendRoutingTable(self):
+        """Send alive signal."""
+        while True:
+            print("Enviei a routing table")
+
+
+
+            for path in self.routingTable:
+                pathToSend=copy.deepcopy(self.routingTable)
+                print(self.routingTable)
+                
+                #print(pathToSend)
+                dest=pathToSend[path][0]
+                pathToSend[path].pop(0)
+
+                for otherPaths in list(pathToSend):
+                    #print(otherPaths)
+                    if path!=otherPaths:
+                        #print("ENtrei uma vez")
+                        pathToSend.pop(otherPaths)
+                #print(pathToSend)
+                
+                routingTable = str.encode(json.dumps(pathToSend)) #data serialized
+
+                self.sendRoutingTableSocket.sendto(routingTable, (str(dest), 24998))
+
+            sleep(2)
+    
     def getRoutingTable(self):
         while True:
             try:
-                teste = self.getRoutingTableSocket.recv(20480)
-                print(teste)
+                data = self.getRoutingTableSocket.recv(20480)
                 
+                UpdatedRoutingTable=json.loads(data.decode())
+                print(UpdatedRoutingTable)
 
+                for key in UpdatedRoutingTable:
+                    print("cama")
+                    if key in self.routingTable:
+                        self.routingTable[key]=UpdatedRoutingTable[key]
+                    else:
+                        self.routingTable.update(UpdatedRoutingTable)
+                
+                #self.RoutingTable.update(teste)
+                
+                self.SendRoutingTable()
             except:
                 print("saiu do loop")
                 break    
@@ -61,8 +105,7 @@ class Router:
             except:
                 print("saiu do loop")
                 break    
-
-                    
+                
         
     def openRtpPort(self):
         """Open RTP socket binded to a specified port."""
@@ -92,7 +135,7 @@ class Router:
         """Send RTP packets over UDP."""
         #print(self.data)
         if self.data:
-            print("Sending")
+            #print("Sending")
 
             self.sendrtpSocket.sendto(self.data, (destIP, 25000))
             #self.sendrtpSocket.sendto(self.data, ('10.0.2.20', 25000))
