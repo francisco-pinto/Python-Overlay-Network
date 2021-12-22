@@ -19,8 +19,7 @@ class Router:
 
     data = 0
 
-    def __init__(self, destIP):
-        self.destIP = destIP
+    def __init__(self):
         self.rtspSeq = 0
         self.sessionId = 0
         self.frameNbr = 0
@@ -28,6 +27,11 @@ class Router:
         t.start()
         getRoutingTable = threading.Thread(target=self.getRoutingTable, args=())
         getRoutingTable.start()
+        
+        sendingRoutingTable = threading.Thread(target=self.SendRoutingTable, args=())
+        sendingRoutingTable.start()
+        
+        
         self.openRtpPort()
         self.listenRtp()
    
@@ -38,13 +42,13 @@ class Router:
             print("Enviei a routing table")
 
 
-
             for path in self.routingTable:
                 pathToSend=copy.deepcopy(self.routingTable)
-                print(self.routingTable)
-                
                 #print(pathToSend)
-                dest=pathToSend[path][0]
+                
+                #print(pathToSend[path][0])
+                destIP = pathToSend[path][0]
+                #print(self.destIP)
                 pathToSend[path].pop(0)
 
                 for otherPaths in list(pathToSend):
@@ -56,32 +60,41 @@ class Router:
                 
                 routingTable = str.encode(json.dumps(pathToSend)) #data serialized
 
-                self.sendRoutingTableSocket.sendto(routingTable, (str(dest), 24998))
+                #sendRoutingTable = threading.Thread(target=self.sendRTable, args=(routingTable, x))
+                #sendRoutingTable.start()
+                
+                self.sendRoutingTableSocket.sendto(routingTable, (str(destIP), 24998))
 
             sleep(2)
     
+    def sendRTable(self, data, dest):
+        print("Enviei")
+        print(data)
+        self.sendRoutingTableSocket.sendto(data, (str(dest), 24998))
+
     def getRoutingTable(self):
+        print("Recebi a routing table")
         while True:
             try:
+                print("entrei aqui")
                 data = self.getRoutingTableSocket.recv(20480)
                 
                 UpdatedRoutingTable=json.loads(data.decode())
-                print(UpdatedRoutingTable)
+                #print(UpdatedRoutingTable)
+                
 
                 for key in UpdatedRoutingTable:
-                    print("cama")
+                    #print(key)
                     if key in self.routingTable:
                         self.routingTable[key]=UpdatedRoutingTable[key]
                     else:
                         self.routingTable.update(UpdatedRoutingTable)
                 
                 #self.RoutingTable.update(teste)
-                
-                self.SendRoutingTable()
+                #print(self.routingTable)
             except:
-                print("saiu do loop")
-                break    
-
+                print("Erro ao ler do getROutingTable")
+                
     def sendAliveSignal(self):
         """Send alive signal."""
         while True:
@@ -91,22 +104,21 @@ class Router:
             self.aliveSignalSocket.sendto(str("Alive " + host_name).encode(), ('10.0.0.10', 25000))
             sleep(1)
 
-
     def listenRtp(self):				
         """Listen for RTP packets."""
         while True:
             try:
                 self.data = self.rtpSocket.recv(20480)
                 #print(self.data)
-                for x in self.destIP:
-                    t=threading.Thread(target=self.sendRtp, args=(x,))
+                for x in self.routingTable:
+                    destIP=self.routingTable[x][0]
+                    t=threading.Thread(target=self.sendRtp, args=(destIP,))
                     t.start()
 
             except:
                 print("saiu do loop")
                 break    
-                
-        
+                    
     def openRtpPort(self):
         """Open RTP socket binded to a specified port."""
         # Create a new datagram socket to receive RTP packets from the server
@@ -130,16 +142,14 @@ class Router:
         except:
             tkMessageBox.showwarning('Unable to Bind', 'Unable to bind PORT for ROuting Table')
 
-
     def sendRtp(self, destIP):
         """Send RTP packets over UDP."""
         #print(self.data)
         if self.data:
-            #print("Sending")
+            print("Sending")
+            
 
             self.sendrtpSocket.sendto(self.data, (destIP, 25000))
-            #self.sendrtpSocket.sendto(self.data, ('10.0.2.20', 25000))
-            #self.sendrtpSocket.sendto(self.data, ('10.0.3.20', 25000))
 
 
 
@@ -148,18 +158,10 @@ class Router:
 
 
 if __name__ == "__main__":
-    destPort=[]
 
-    for x in range(1,6):
-        try:
-            destPort.append(sys.argv[x])
-            print(destPort)
-        except:
-            break
-    
     #arg1 é a porta que recebe
 
-    Router(destPort)
+    Router()
     #openRtpPort()
 
     #threading.Thread(target=listenRtp).start(

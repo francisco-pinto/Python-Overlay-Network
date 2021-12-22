@@ -46,14 +46,11 @@ class Servidor:
 		while True:
 			print("Enviei a routing table")
 			
-			
-
 			for path in self.routingTable:
 				pathToSend=copy.deepcopy(self.routingTable)
-				print(self.routingTable)
 				
-				#print(pathToSend)
-				dest=pathToSend[path][0]
+				# There is only one IP
+				destIP=pathToSend[path][0]
 				pathToSend[path].pop(0)
 
 				for otherPaths in list(pathToSend):
@@ -61,17 +58,21 @@ class Servidor:
 					if path!=otherPaths:
 						#print("ENtrei uma vez")
 						pathToSend.pop(otherPaths)
-				#print(pathToSend)
 				
+				#print(pathToSend)
 				routingTable = str.encode(json.dumps(pathToSend)) #data serialized
-
-				self.sendRoutingTableSocket.sendto(routingTable, (str(dest), 24998))
+				#print(routingTable)
+				sendRoutingTable = threading.Thread(target=self.sendRTable, args=(routingTable, destIP))
+				sendRoutingTable.start()
+				#self.sendRoutingTableSocket.sendto(routingTable, (str(dest), 24998))
 			
 			sleep(2)
 
+	def sendRTable(self, data, dest):
+		self.sendRoutingTableSocket.sendto(data, (str(dest), 24998))
+
 	def CalculateShortestPath(self):
-		
-		
+
 		nodeId=[]
 
 		init_graph = defaultdict(dict)
@@ -82,6 +83,8 @@ class Servidor:
 
 		for node in self.nodes:
 			if node.online==1:
+				print("Para o nó")
+				print(node.id)
 				for connections in node.connections:
 
 					node_number1=connections.fromNode
@@ -90,8 +93,10 @@ class Servidor:
 					#Verify if neighbor is online
 					for neighborNode in self.nodes:
 						if(neighborNode.id==node_number2 and neighborNode.online==1):
+							print("Os vizinhos sao")
+							print(node_number1)
 							init_graph[node_number1][node_number2] = 1
-			
+					
 		#print(init_graph)
 
 		graph = Graph(nodeId, init_graph)
@@ -106,6 +111,7 @@ class Servidor:
 			else:
 				print("There are no clients online")
 		
+		print(paths)
 		self.CreateRoutingTable(paths)
 
 	def CreateRoutingTable(self, paths):
@@ -118,15 +124,14 @@ class Servidor:
 		
 
 			#GEt ip's through the id's
-			for no in path:
-								
+			for no in path:	
 				try:
 					nextNodeIndex=path.index(no)
 					print(nextNodeIndex)
 					nextNode=path[int(nextNodeIndex)+1]
 					for node in self.nodes:
 						for connections in node.connections:
-							if node.id==no and no==connections.fromNode and nextNode==connections.toNode:
+							if node.id==no and node.online==1 and no==connections.fromNode and nextNode==connections.toNode:
 								
 								newIP=no.replace(no, connections.fromIP)
 								ipPath.append(newIP)
@@ -138,7 +143,7 @@ class Servidor:
 			ipPath.reverse()	
 			self.routingTable[dest]=ipPath
 		
-		#print(self.routingTable)
+			print(self.routingTable)
 
 	def GetNetworkTopology(self):
 		file = minidom.parse('Topologia.xml')

@@ -79,7 +79,6 @@ class Graph(object):
 
         return previous_nodes, shortest_path
 
-
     def print_result(self, previous_nodes, shortest_path, start_node, target_node):
         path = []
         node = target_node
