@@ -56,7 +56,7 @@ class Router:
                     if path!=otherPaths:
                         #print("ENtrei uma vez")
                         pathToSend.pop(otherPaths)
-                #print(pathToSend)
+                print(pathToSend)
                 
                 routingTable = str.encode(json.dumps(pathToSend)) #data serialized
 
@@ -147,7 +147,7 @@ class Router:
         #print(self.data)
         if self.data:
             print("Sending")
-            
+            print(destIP)
 
             self.sendrtpSocket.sendto(self.data, (destIP, 25000))
 

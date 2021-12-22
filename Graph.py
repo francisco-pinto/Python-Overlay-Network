@@ -57,6 +57,8 @@ class Graph(object):
             for node in unvisited_nodes: # Iterate over the nodes
                 if current_min_node == None:
                     current_min_node = node
+                    print("valor minimo é")
+                    print(node)
                 elif shortest_path[node] < shortest_path[current_min_node]:
                     current_min_node = node
                     
@@ -83,6 +85,11 @@ class Graph(object):
         path = []
         node = target_node
 
+        print("nos anteriores")
+        print(previous_nodes)
+        print("shortest_path")
+        print(shortest_path)
+
         try:
             while node != start_node:
                 path.append(node)
@@ -94,5 +101,6 @@ class Graph(object):
             #print("We found the following best path with a value of {}.".format(shortest_path[target_node]))
             #print(" -> ".join(reversed(path)))
             return (path)
-        except:
+        except Exception as e:
             print("Impossible to detect path")
+            print(e)

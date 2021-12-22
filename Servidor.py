@@ -32,7 +32,9 @@ class Servidor:
 	def __init__(self):
 		self.GetNetworkTopology()
 		self.openRouterPort()
-		self.CalculateShortestPath()
+		self.ActivateServerNode()
+		#self.CalculateShortestPath()
+
 		maintenance=threading.Thread(target=self.TopologyMaintenance, args=())
 		maintenance.start()
 
@@ -40,6 +42,12 @@ class Servidor:
 		sendRoutingTable.start()
 
 		print("inicio")
+
+	def ActivateServerNode(self):
+		for node in self.nodes:
+			if(node.id=="n1"):
+				node.online=1
+				break
 
 	def SendRoutingTable(self):
 		"""Send alive signal."""
@@ -74,17 +82,15 @@ class Servidor:
 	def CalculateShortestPath(self):
 
 		nodeId=[]
-
 		init_graph = defaultdict(dict)
 
 		for node in self.nodes:
-			nodeId.append(node.id)
-			init_graph[node.id] = {}
+			if node.online==1:
+				nodeId.append(node.id)
+				init_graph[node.id] = {}
 
 		for node in self.nodes:
 			if node.online==1:
-				print("Para o nó")
-				print(node.id)
 				for connections in node.connections:
 
 					node_number1=connections.fromNode
@@ -94,10 +100,13 @@ class Servidor:
 					for neighborNode in self.nodes:
 						if(neighborNode.id==node_number2 and neighborNode.online==1):
 							print("Os vizinhos sao")
-							print(node_number1)
+							print(node_number2)
 							init_graph[node_number1][node_number2] = 1
 					
-		#print(init_graph)
+			#previous_node=node.id
+
+		print(init_graph)
+		print(nodeId)
 
 		graph = Graph(nodeId, init_graph)
 
@@ -162,7 +171,6 @@ class Servidor:
 	#GET INTERFACES
 
 			interfaces = node.getElementsByTagName('interface')
-	
 			for interface in interfaces:
 				ips=interface.getElementsByTagName('ip')
 				ports=interface.getElementsByTagName('port')
@@ -182,7 +190,7 @@ class Servidor:
 			fromIP=0
 			toNode=0
 			toIP=0
-			links = file.getElementsByTagName('link')
+			links = node.getElementsByTagName('link')
 
 			for link in links:
 				froms = link.getElementsByTagName('from')
@@ -225,7 +233,7 @@ class Servidor:
 				for node in self.nodes:
 					#Verify if online nodes are disconnected
 					#Basically if in 3 secs they dont send message, they are disconnected 
-					if node.id!=nodeDataId and node.online==1:
+					if node.id!=nodeDataId and node.online==1 and node.id!="n1":
 						if node.aliveCount==0:
 							node.aliveCount=3
 							node.online=0
