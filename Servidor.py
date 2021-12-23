@@ -230,7 +230,7 @@ class Servidor:
 				#print(nodeData)
 
 				nodeDataId = nodeData.decode().replace("Alive ", "")
-				#print(nodeDataId)
+				#print(nodeData)
 				for node in self.nodes:
 					#Verify if online nodes are disconnected
 					#Basically if in 3 secs they dont send message, they are disconnected 
