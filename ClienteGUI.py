@@ -13,11 +13,10 @@ class ClienteGUI:
 	aliveSignalSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 	# Initiation..
-	def __init__(self, master, addr, port):
+	def __init__(self, master, port):
 		self.master = master
 		self.master.protocol("WM_DELETE_WINDOW", self.handler)
 		self.createWidgets()
-		self.addr = addr
 		self.port = int(port)
 		self.rtspSeq = 0
 		self.sessionId = 0
@@ -36,7 +35,7 @@ class ClienteGUI:
 			host_name = socket.gethostname()
 			host_name = "c"+ host_name
 			print("Hostname :  ",host_name)
-			self.aliveSignalSocket.sendto(str("Alive " + host_name).encode(), ('10.0.0.10', 25000))
+			self.aliveSignalSocket.sendto(str("Alive " + host_name).encode(), ('10.0.0.10', 24999))
 			sleep(1)
 
 	def createWidgets(self):
@@ -142,7 +141,7 @@ class ClienteGUI:
 		
 		try:
 			# Bind the socket to the address using the RTP port
-			self.rtpSocket.bind((self.addr, self.port))
+			self.rtpSocket.bind(('0.0.0.0', self.port))
 			print('\nBind \n')
 		except:
 			tkMessageBox.showwarning('Unable to Bind', 'Unable to bind PORT=%d' %self.rtpPort)

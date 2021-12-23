@@ -101,7 +101,7 @@ class Router:
             print("Enviei")
             host_name = socket.gethostname()
             print("Hostname :  ",host_name)
-            self.aliveSignalSocket.sendto(str("Alive " + host_name).encode(), ('10.0.0.10', 25000))
+            self.aliveSignalSocket.sendto(str("Alive " + host_name).encode(), ('10.0.0.10', 24999))
             sleep(1)
 
     def listenRtp(self):				
@@ -159,16 +159,4 @@ class Router:
 
 if __name__ == "__main__":
 
-    #arg1 é a porta que recebe
-
     Router()
-    #openRtpPort()
-
-    #threading.Thread(target=listenRtp).start(
-    #print("REceve data")
-    #listenRtp()
-    #print("SEnding data")
-    #sendRtp()
-
-    #rtpSocket.shutdown(socket.SHUT_RDWR)
-    #rtpSocket.close()

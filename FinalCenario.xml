@@ -1,0 +1,265 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<topology>
+  <nodes>
+      <node id="n1">
+          <interfaces>
+              <interface>
+                  <ip>10.0.0.10</ip>
+                  <port>10000</port>
+              </interface>
+          </interfaces>
+          <links>
+            <link id="1-10">
+                <from node="n1" ip="10.0.0.10"/>
+                <to node="n10" ip="10.0.1.2"/>
+            </link>
+          </links>
+      </node>
+      <node id="n10">
+          <interfaces>
+              <interface>
+                  <ip>10.0.3.1</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.2.1</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.1.1</ip>
+                  <port>10000</port>
+              </interface>
+          </interfaces>
+          <links>
+            <link id="10-1">
+                <from node="n10" ip="10.0.1.2"/>
+                <to node="n1" ip="10.0.0.10"/>
+            </link>
+            <link id="10-9">
+              <from node="n10" ip="10.0.1.1"/>
+              <to node="n9" ip="10.0.1.2"/>
+            </link>
+            <link id="10-7">
+              <from node="n10" ip="10.0.3.1"/>
+              <to node="n7" ip="10.0.6.1"/>
+            </link>
+          </links>
+      </node>
+      <node id="n9">
+          <interfaces>
+              <interface>
+                  <ip>10.0.8.1</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.1.2</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.7.2</ip>
+                  <port>10000</port>
+              </interface>
+          </interfaces>
+          <links>
+            <link id="9-20">
+              <from node="n9" ip="10.0.8.1"/>
+              <to node="cn20" ip="10.0.17.20"/>
+            </link> 
+            <link id="9-2">
+              <from node="n9" ip="10.0.8.1"/>
+              <to node="n2" ip="10.0.16.1"/>
+            </link>   
+          </links>
+      </node>
+      <node id="n2">
+          <interfaces>
+              <interface>
+                  <ip>10.0.16.1</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.10.2</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.11.1</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.18.1</ip>
+                  <port>10000</port>
+              </interface>
+          </interfaces>
+          <links>
+            <link id="2-17">
+              <from node="n2" ip="10.0.18.1"/>
+              <to node="cn17" ip="10.0.18.20"/>
+            </link> 
+            <link id="2-18">
+              <from node="n2" ip="10.0.18.1"/>
+              <to node="cn18" ip="10.0.18.21"/>
+            </link>
+            <link id="2-12">
+              <from node="n2" ip="10.0.11.1"/>
+              <to node="n12" ip="10.0.11.2"/>
+            </link> 
+          </links>
+      </node>
+      <node id="n12">
+          <interfaces>
+              <interface>
+                  <ip>10.0.11.1</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.13.1</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.12.1</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.19.1</ip>
+                  <port>10000</port>
+              </interface>
+          </interfaces>
+          <links>
+            <link id="12-24">
+              <from node="n12" ip="10.0.19.1"/>
+              <to node="cn24" ip="10.0.19.20"/>
+            </link> 
+          </links>
+      </node>
+      <node id="n7">
+          <interfaces>
+              <interface>
+                  <ip>10.0.20.1</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.15.1</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.5.2</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.14.2</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.6.1</ip>
+                  <port>10000</port>
+              </interface>
+          </interfaces>
+          <links>
+            <link id="7-22">
+              <from node="n7" ip="10.0.20.1"/>
+              <to node="cn22" ip="10.0.20.21"/>
+            </link> 
+          </links>
+      </node>
+      <node id="n7">
+          <interfaces>
+              <interface>
+                  <ip>10.0.20.1</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.15.1</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.5.2</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.14.2</ip>
+                  <port>10000</port>
+              </interface>
+              <interface>
+                  <ip>10.0.6.1</ip>
+                  <port>10000</port>
+              </interface>
+          </interfaces>
+          <links>
+            <link id="7-22">
+              <from node="n7" ip="10.0.20.1"/>
+              <to node="cn22" ip="10.0.20.21"/>
+            </link> 
+          </links>
+      </node>
+      <node id="cn17">
+          <interfaces>
+              <interface>
+                  <ip>10.0.18.20</ip>
+                  <port>10000</port>
+              </interface>
+          </interfaces>
+          <links>
+            <link id="17-2">
+              <from node="cn17" ip="10.0.18.20"/>
+              <to node="n2" ip="10.0.18.1"/>
+            </link> 
+          </links>
+      </node>
+      <node id="cn24">
+          <interfaces>
+              <interface>
+                  <ip>10.0.19.20</ip>
+                  <port>10000</port>
+              </interface>
+          </interfaces>
+          <links>
+            <link id="24-2">
+              <from node="cn24" ip="10.0.19.20"/>
+              <to node="n2" ip="10.0.19.1"/>
+            </link> 
+          </links>
+      </node>
+      <node id="cn18">
+          <interfaces>
+              <interface>
+                  <ip>10.0.18.21</ip>
+                  <port>10000</port>
+              </interface>
+          </interfaces>
+          <links>
+            <link id="18-2">
+              <from node="cn18" ip="10.0.18.21"/>
+              <to node="n2" ip="10.0.18.1"/>
+            </link> 
+          </links>
+      </node>
+      <node id="cn20">
+          <interfaces>
+              <interface>
+                  <ip>10.0.17.20</ip>
+                  <port>10000</port>
+              </interface>
+          </interfaces>
+          <links>
+            <link id="20-9">
+              <from node="cn20" ip="10.0.17.20"/>
+              <to node="n9" ip="10.0.8.1"/>
+            </link> 
+          </links>
+      </node>
+      <node id="cn22">
+          <interfaces>
+              <interface>
+                  <ip>10.0.20.21</ip>
+                  <port>10000</port>
+              </interface>
+          </interfaces>
+          <links>
+            <link id="22-7">
+              <from node="cn22" ip="10.0.20.21"/>
+              <to node="n7" ip="10.0.20.1"/>
+            </link> 
+          </links>
+      </node>
+  </nodes>
+</topology>

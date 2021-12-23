@@ -12,7 +12,7 @@ if __name__ == "__main__":
 	root = Tk()
 	
 	# Create a new client
-	app = ClienteGUI(root, addr, port)
+	app = ClienteGUI(root, 25000)
 	app.master.title("Cliente Exemplo")	
 	root.mainloop()
 	

@@ -50,15 +50,17 @@ class Servidor:
 				break
 
 	def SendRoutingTable(self):
-		"""Send alive signal."""
+		"""Send routing signal."""
 		while True:
 			print("Enviei a routing table")
 			
 			for path in self.routingTable:
 				pathToSend=copy.deepcopy(self.routingTable)
-				
+				print("A routing table é: ")
+				print(self.routingTable)
 				# There is only one IP
 				destIP=pathToSend[path][0]
+				self.clientInfo['rtpAddr']=destIP
 				pathToSend[path].pop(0)
 
 				for otherPaths in list(pathToSend):
@@ -124,10 +126,9 @@ class Servidor:
 		self.CreateRoutingTable(paths)
 
 	def CreateRoutingTable(self, paths):
-		
 
 		for path in paths:
-			#print(path)
+			
 			ipPath=[]
 			dest=path[0]
 		
@@ -155,7 +156,7 @@ class Servidor:
 			print(self.routingTable)
 
 	def GetNetworkTopology(self):
-		file = minidom.parse('Topologia.xml')
+		file = minidom.parse('FinalCenario.xml')
 
 	#_______________________________________________________
 	#GET NODES SPECS
@@ -271,7 +272,7 @@ class Servidor:
 
 		try:
 			# Bind the socket to the address using the RTP port
-			self.maintenanceSocket.bind(('0.0.0.0', 25000))
+			self.maintenanceSocket.bind(('0.0.0.0', 24999))
 			print('\nBind \n')
 		except:
 			tkMessageBox.showwarning('Unable to Bind', 'Unable to bind PORT')
